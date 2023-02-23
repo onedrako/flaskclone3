@@ -26,6 +26,7 @@ def index():
 @bp.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
+        print(request.form)
         email = request.form.get('email')
         subject = request.form.get('subject')
         content = request.form.get('content')
@@ -56,7 +57,14 @@ def send(to, subject, content):
     sg = sendgrid.SendGridAPIClient(api_key=current_app.config['SENDGRID_KEY'])
     from_email = Email(current_app.config['FROM_EMAIL'])
     to_email = To(to)
-    content = Content('text/plain', content)
+    content = Content("text/plain", content)
     mail = Mail(from_email, to_email, subject, content)
-    response = sg.client.mail.send.post(request_body = mail.get())
-    print(response)
+    try:
+        response = sg.client.mail.send.post(request_body=mail.get())
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e)
+    # response = sg.client.mail.send.post(request_body=mail.get())
+    # print(response)
